@@ -1,0 +1,36 @@
+name: net_pulse
+description: >
+  Connectivity-aware HTTP client with automatic offline request queuing,
+  persistent retry with exponential backoff, and a zero-config animated
+  "online/offline" banner widget. Wrap your app once, never lose a request.
+version: 0.1.0
+homepage: https://github.com/YOUR_GITHUB_USERNAME/net_pulse
+repository: https://github.com/YOUR_GITHUB_USERNAME/net_pulse
+issue_tracker: https://github.com/YOUR_GITHUB_USERNAME/net_pulse/issues
+documentation: https://github.com/YOUR_GITHUB_USERNAME/net_pulse#readme
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  connectivity_plus: ^6.0.0
+  shared_preferences: ^2.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  # no assets needed
+
+topics:
+  - connectivity
+  - http
+  - offline
+  - networking
+  - retry
