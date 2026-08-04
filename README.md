@@ -22,7 +22,7 @@ lose signal mid-route and you can't afford to lose an order update.
 
 ```yaml
 dependencies:
-  linkloom: ^0.1.0
+  linkloom: ^0.2.0
 ```
 
 ## Usage
@@ -30,7 +30,15 @@ dependencies:
 ```dart
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NetPulse.init(); // one-time setup, call before runApp
+  await NetPulse.init(
+    maxAttempts: 8,
+    ttl: const Duration(hours: 1),
+    onQueued: (request) => debugPrint('Queued: ${request.id}'),
+    onRetrySuccess: (request, statusCode) =>
+        debugPrint('Retry succeeded: $statusCode'),
+    onRetryFailed: (request, reason) =>
+        debugPrint('Retry failed: $reason'),
+  );
   runApp(const MyApp());
 }
 
@@ -57,6 +65,7 @@ final result = await client.post(
   'https://example.com/api/orders',
   headers: {'Content-Type': 'application/json'},
   body: '{"orderId": 123}',
+  priority: NetPulsePriority.high,
 );
 
 if (result.queued) {
@@ -68,6 +77,19 @@ if (result.queued) {
 } else {
   print('Failed: ${result.error}');
 }
+```
+
+## Priority
+
+Use the optional `priority` parameter on any request to influence retry order.
+High-priority items are retried first, then normal, then low priority.
+
+```dart
+await client.post(
+  'https://example.com/api/orders',
+  body: '{"orderId": 123}',
+  priority: NetPulsePriority.high,
+);
 ```
 
 ## API overview

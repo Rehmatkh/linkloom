@@ -3,11 +3,53 @@ import 'dart:convert';
 /// HTTP method supported by a queued request.
 enum NetPulseMethod { get, post, put, patch, delete }
 
+/// Priority for queued requests. Higher priority requests are retried first.
+enum NetPulsePriority { low, normal, high }
+
+/// A callback invoked whenever a request is queued.
+typedef NetPulseQueuedCallback = void Function(QueuedRequest request);
+
+/// A callback invoked when a queued request succeeds during retry.
+typedef NetPulseRetrySuccessCallback = void Function(
+  QueuedRequest request,
+  int statusCode,
+);
+
+/// A callback invoked when a queued request is dropped permanently.
+typedef NetPulseRetryFailedCallback = void Function(
+  QueuedRequest request,
+  String reason,
+);
+
 NetPulseMethod methodFromString(String value) {
   return NetPulseMethod.values.firstWhere(
     (m) => m.name == value,
     orElse: () => NetPulseMethod.get,
   );
+}
+
+int _priorityRank(NetPulsePriority priority) {
+  return switch (priority) {
+    NetPulsePriority.high => 0,
+    NetPulsePriority.normal => 1,
+    NetPulsePriority.low => 2,
+  };
+}
+
+/// Sorts requests so that high priority items are handled before normal and
+/// low priority items, with older items first inside the same tier.
+List<QueuedRequest> sortByPriority(List<QueuedRequest> requests) {
+  final sorted = List<QueuedRequest>.from(requests);
+  sorted.sort((a, b) {
+    final priorityComparison = _priorityRank(a.priority).compareTo(
+      _priorityRank(b.priority),
+    );
+    if (priorityComparison != 0) {
+      return priorityComparison;
+    }
+    return a.createdAt.compareTo(b.createdAt);
+  });
+  return sorted;
 }
 
 /// A single request that failed (or was made while offline) and is
@@ -19,6 +61,7 @@ class QueuedRequest {
   final Map<String, String> headers;
   final String? body;
   final DateTime createdAt;
+  final NetPulsePriority priority;
   int attempts;
 
   QueuedRequest({
@@ -28,6 +71,7 @@ class QueuedRequest {
     required this.headers,
     required this.attempts,
     this.body,
+    this.priority = NetPulsePriority.normal,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -39,6 +83,7 @@ class QueuedRequest {
         'body': body,
         'createdAt': createdAt.toIso8601String(),
         'attempts': attempts,
+        'priority': priority.name,
       };
 
   factory QueuedRequest.fromJson(Map<String, dynamic> json) => QueuedRequest(
@@ -49,7 +94,20 @@ class QueuedRequest {
         body: json['body'] as String?,
         createdAt: DateTime.parse(json['createdAt'] as String),
         attempts: json['attempts'] as int,
+        priority: json['priority'] == null
+            ? NetPulsePriority.normal
+            : NetPulsePriority.values.firstWhere(
+                (priority) => priority.name == json['priority'],
+                orElse: () => NetPulsePriority.normal,
+              ),
       );
+
+  bool isExpired(Duration? ttl) {
+    if (ttl == null) {
+      return false;
+    }
+    return DateTime.now().difference(createdAt) > ttl;
+  }
 
   static String encodeList(List<QueuedRequest> items) =>
       jsonEncode(items.map((e) => e.toJson()).toList());

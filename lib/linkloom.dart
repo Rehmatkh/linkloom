@@ -4,4 +4,10 @@ library linkloom;
 
 export 'src/linkloom_client.dart';
 export 'src/linkloom_banner.dart';
-export 'src/models.dart' show NetPulseResult, NetPulseMethod;
+export 'src/models.dart' show
+    NetPulseResult,
+    NetPulseMethod,
+    NetPulsePriority,
+    NetPulseQueuedCallback,
+    NetPulseRetrySuccessCallback,
+    NetPulseRetryFailedCallback;

@@ -7,10 +7,24 @@ import 'request_queue.dart';
 
 /// Call [NetPulse.init] once (e.g. in `main()`) before using [NetPulseClient].
 class NetPulse {
-  static Future<void> init() async {
+  static Future<void> init({
+    int maxAttempts = NetPulseQueue.defaultMaxAttempts,
+    Duration? ttl,
+    NetPulseQueuedCallback? onQueued,
+    NetPulseRetrySuccessCallback? onRetrySuccess,
+    NetPulseRetryFailedCallback? onRetryFailed,
+  }) async {
     NetPulseConnectivity.instance.start();
-    await NetPulseQueue.instance.init();
+    await NetPulseQueue.instance.init(
+      maxAttempts: maxAttempts,
+      ttl: ttl,
+      onQueued: onQueued,
+      onRetrySuccess: onRetrySuccess,
+      onRetryFailed: onRetryFailed,
+    );
   }
+
+  static Future<void> retryNow() => NetPulseQueue.instance.drain();
 
   /// Number of requests currently waiting to be retried.
   static int get pendingCount => NetPulseQueue.instance.length;
@@ -31,33 +45,54 @@ class NetPulseClient {
   NetPulseClient({http.Client? inner, this.timeout = const Duration(seconds: 10)})
       : _inner = inner ?? http.Client();
 
-  Future<NetPulseResult> get(String url, {Map<String, String>? headers}) =>
-      _execute(NetPulseMethod.get, url, headers ?? const {}, null);
+  Future<NetPulseResult> get(
+    String url, {
+    Map<String, String>? headers,
+    NetPulsePriority priority = NetPulsePriority.normal,
+  }) =>
+      _execute(NetPulseMethod.get, url, headers ?? const {}, null, priority);
 
-  Future<NetPulseResult> post(String url,
-          {Map<String, String>? headers, String? body}) =>
-      _execute(NetPulseMethod.post, url, headers ?? const {}, body);
+  Future<NetPulseResult> post(
+    String url, {
+    Map<String, String>? headers,
+    String? body,
+    NetPulsePriority priority = NetPulsePriority.normal,
+  }) =>
+      _execute(NetPulseMethod.post, url, headers ?? const {}, body, priority);
 
-  Future<NetPulseResult> put(String url,
-          {Map<String, String>? headers, String? body}) =>
-      _execute(NetPulseMethod.put, url, headers ?? const {}, body);
+  Future<NetPulseResult> put(
+    String url, {
+    Map<String, String>? headers,
+    String? body,
+    NetPulsePriority priority = NetPulsePriority.normal,
+  }) =>
+      _execute(NetPulseMethod.put, url, headers ?? const {}, body, priority);
 
-  Future<NetPulseResult> patch(String url,
-          {Map<String, String>? headers, String? body}) =>
-      _execute(NetPulseMethod.patch, url, headers ?? const {}, body);
+  Future<NetPulseResult> patch(
+    String url, {
+    Map<String, String>? headers,
+    String? body,
+    NetPulsePriority priority = NetPulsePriority.normal,
+  }) =>
+      _execute(NetPulseMethod.patch, url, headers ?? const {}, body, priority);
 
-  Future<NetPulseResult> delete(String url,
-          {Map<String, String>? headers, String? body}) =>
-      _execute(NetPulseMethod.delete, url, headers ?? const {}, body);
+  Future<NetPulseResult> delete(
+    String url, {
+    Map<String, String>? headers,
+    String? body,
+    NetPulsePriority priority = NetPulsePriority.normal,
+  }) =>
+      _execute(NetPulseMethod.delete, url, headers ?? const {}, body, priority);
 
   Future<NetPulseResult> _execute(
     NetPulseMethod method,
     String url,
     Map<String, String> headers,
     String? body,
+    NetPulsePriority priority,
   ) async {
     if (!NetPulseConnectivity.instance.isOnline) {
-      await _queueIt(method, url, headers, body);
+      await _queueIt(method, url, headers, body, priority);
       return const NetPulseResult.queuedForRetry();
     }
     try {
@@ -90,18 +125,23 @@ class NetPulseClient {
       }
       if (response.statusCode >= 500) {
         // Server-side failure — worth queuing for retry too.
-        await _queueIt(method, url, headers, body);
+        await _queueIt(method, url, headers, body, priority);
         return const NetPulseResult.queuedForRetry();
       }
       return NetPulseResult.success(response.statusCode, response.body);
     } catch (e) {
-      await _queueIt(method, url, headers, body);
+      await _queueIt(method, url, headers, body, priority);
       return const NetPulseResult.queuedForRetry();
     }
   }
 
-  Future<void> _queueIt(NetPulseMethod method, String url,
-      Map<String, String> headers, String? body) {
+  Future<void> _queueIt(
+    NetPulseMethod method,
+    String url,
+    Map<String, String> headers,
+    String? body,
+    NetPulsePriority priority,
+  ) {
     final req = QueuedRequest(
       id: '${DateTime.now().microsecondsSinceEpoch}',
       method: method,
@@ -109,6 +149,7 @@ class NetPulseClient {
       headers: headers,
       body: body,
       attempts: 0,
+      priority: priority,
     );
     return NetPulseQueue.instance.enqueue(req);
   }

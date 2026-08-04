@@ -3,7 +3,15 @@ import 'package:linkloom/linkloom.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NetPulse.init(); // one-time setup
+  await NetPulse.init(
+    maxAttempts: 8,
+    ttl: const Duration(hours: 1),
+    onQueued: (request) => debugPrint('Queued ${request.id}'),
+    onRetrySuccess: (request, statusCode) =>
+        debugPrint('Retry succeeded for ${request.id}: $statusCode'),
+    onRetryFailed: (request, reason) =>
+        debugPrint('Retry failed for ${request.id}: $reason'),
+  );
   runApp(const MyApp());
 }
 
@@ -14,7 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'linkloom example',
-      home: NetPulseBanner(  // <- zero-config offline banner
+      home: NetPulseBanner(
         child: HomePage(),
       ),
     );
@@ -38,6 +46,7 @@ class _HomePageState extends State<HomePage> {
       'https://example.com/api/orders',
       headers: {'Content-Type': 'application/json'},
       body: '{"orderId": 123}',
+      priority: NetPulsePriority.high,
     );
 
     setState(() {
