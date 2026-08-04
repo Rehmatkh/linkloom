@@ -1,6 +1,6 @@
-# Contributing to net_pulse
+# Contributing to linkloom
 
-Thanks for helping improve net_pulse! 
+Thanks for helping improve linkloom! 
 
 ## Reporting a bug / fixing an issue
 
@@ -28,8 +28,8 @@ Thanks for helping improve net_pulse!
 ## Local setup
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/net_pulse.git
-cd net_pulse
+git clone https://github.com/YOUR_GITHUB_USERNAME/linkloom.git
+cd linkloom
 flutter pub get
 flutter test
 cd example && flutter pub get && flutter run

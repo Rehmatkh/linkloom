@@ -14,6 +14,6 @@ Minimal code snippet or steps.
 What you expected to happen.
 
 **Environment**
-- net_pulse version:
+- linkloom version:
 - Flutter version (`flutter --version`):
 - Platform (Android/iOS/web/desktop):

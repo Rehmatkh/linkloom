@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:net_pulse/net_pulse.dart';
+import 'package:linkloom/linkloom.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'net_pulse example',
+      title: 'linkloom example',
       home: NetPulseBanner(  // <- zero-config offline banner
         child: HomePage(),
       ),
@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('net_pulse example')),
+      appBar: AppBar(title: const Text('linkloom example')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

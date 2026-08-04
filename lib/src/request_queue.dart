@@ -12,7 +12,7 @@ class NetPulseQueue {
   NetPulseQueue._internal();
   static final NetPulseQueue instance = NetPulseQueue._internal();
 
-  static const _storageKey = 'net_pulse_queue_v1';
+  static const _storageKey = 'linkloom_queue_v1';
   static const int maxAttempts = 6;
 
   final List<QueuedRequest> _queue = [];

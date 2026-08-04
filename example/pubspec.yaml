@@ -1,5 +1,5 @@
-name: net_pulse_example
-description: Example app for net_pulse.
+name: linkloom_example
+description: Example app for linkloom.
 publish_to: 'none'
 version: 0.1.0
 
@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  net_pulse:
+  linkloom:
     path: ../
 
 dev_dependencies:

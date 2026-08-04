@@ -1,13 +1,13 @@
-name: net_pulse
+name: linkloom
 description: >
   Connectivity-aware HTTP client with automatic offline request queuing,
   persistent retry with exponential backoff, and a zero-config animated
   "online/offline" banner widget. Wrap your app once, never lose a request.
 version: 0.1.0
-homepage: https://github.com/Rehmatkh/net_pluse
-repository: https://github.com/Rehmatkh/net_pluse
-issue_tracker: https://github.com/Rehmatkh/net_pluse/issues
-documentation: https://github.com/Rehmatkh/net_pluse#readme
+homepage: https://github.com/Rehmatkh/linkloom
+repository: https://github.com/Rehmatkh/linkloom
+issue_tracker: https://github.com/Rehmatkh/linkloom/issues
+documentation: https://github.com/Rehmatkh/linkloom#readme
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

@@ -1,12 +1,12 @@
-# net_pulse
+# linkloom
 
-[![pub package](https://img.shields.io/pub/v/net_pulse.svg)](https://pub.dev/packages/net_pulse)
+[![pub package](https://img.shields.io/pub/v/linkloom.svg)](https://pub.dev/packages/linkloom)
 
 Connectivity-aware HTTP client for Flutter that **never silently drops a
 request**, plus a **zero-config offline/online banner** — in one package.
 
 Most apps need two separate packages (`connectivity_plus` + some retry
-logic you hand-roll) to handle this correctly. `net_pulse` combines both:
+logic you hand-roll) to handle this correctly. `linkloom` combines both:
 
 - 📡 **Auto offline queue** — requests made while offline (or that fail)
   are persisted to disk and retried automatically with exponential backoff
@@ -22,7 +22,7 @@ lose signal mid-route and you can't afford to lose an order update.
 
 ```yaml
 dependencies:
-  net_pulse: ^0.1.0
+  linkloom: ^0.1.0
 ```
 
 ## Usage
