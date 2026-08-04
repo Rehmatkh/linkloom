@@ -4,10 +4,10 @@ description: >
   persistent retry with exponential backoff, and a zero-config animated
   "online/offline" banner widget. Wrap your app once, never lose a request.
 version: 0.1.0
-homepage: https://github.com/YOUR_GITHUB_USERNAME/net_pulse
-repository: https://github.com/YOUR_GITHUB_USERNAME/net_pulse
-issue_tracker: https://github.com/YOUR_GITHUB_USERNAME/net_pulse/issues
-documentation: https://github.com/YOUR_GITHUB_USERNAME/net_pulse#readme
+homepage: https://github.com/Rehmatkh/net_pluse
+repository: https://github.com/Rehmatkh/net_pluse
+issue_tracker: https://github.com/Rehmatkh/net_pluse/issues
+documentation: https://github.com/Rehmatkh/net_pluse#readme
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
